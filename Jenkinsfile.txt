@@ -1,0 +1,74 @@
+pipeline {
+  agent any
+  parameters {
+    booleanParam(name: 'PLAN_TERRAFORM', defaultValue: false, description: 'Check to plan Terraform changes')
+    booleanParam(name: 'APPLY_TERRAFORM', defaultValue: false, description: 'Check to apply Terraform changes')
+    booleanParam(name: 'DESTROY_TERRAFORM', defaultValue: false, description: 'Check to apply Terraform changes')
+  }
+  stages {
+    stage('clone git repo') {
+      steps {
+        deleteDir()
+        git branch: 'main', url: 'https://github.com/Sowmyadevi2005/flask-mysql-webapp.git'
+      }
+    }
+  }
+  stage('Terraform init') {
+    steps {
+      withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'aws-accesskey-sowmya',
+        secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+        dir('infra') {
+          sh 'echo "=================Terraform Init=================="'
+          sh 'terraform init'
+        }
+      }
+    }
+  }
+  stage('Terraform plan') {
+    steps {
+      script {
+        if (params.PLAN_TERRAFORM) {
+          withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'aws-accesskey-sowmya',
+            secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+            dir('infra') {
+              sh 'echo "=================Terraform plan=================="'
+              sh 'terraform plan -var-file=terraform.tfvars --auto-aprrove'
+            }
+          }
+        }
+      }
+    }
+  }
+
+  stage('Terraform Apply') {
+    steps {
+      script {
+        if (params.APPLY_TERRAFORM) {
+          withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'aws-accesskey-sowmya',
+            secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+            dir('infra') {
+              sh 'echo "=================Terraform Apply=================="'
+              sh 'terraform apply -var-file=terraform.tfvars --auto-aprrove'
+            }
+          }
+        }
+      }
+    }
+  }
+
+  stage('Terraform Destroy') {
+    steps {
+      script {
+        if (params.DESTROY_TERRAFORM) {
+          withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'aws-accesskey-sowmya',
+            secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+            dir('infra') {
+              sh 'echo "=================Terraform Destroy=================="'
+              sh 'terraform destroy -var-file=terraform.tfvars --auto-aprrove'
+            }
+          }
+        }
+      }
+    }
+  }
+}
