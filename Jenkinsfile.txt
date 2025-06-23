@@ -32,7 +32,7 @@ pipeline {
             secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
             dir('infra') {
               sh 'echo "=================Terraform plan=================="'
-              sh 'terraform plan -var-file=terraform.tfvars --auto-aprrove'
+              sh 'terraform plan -var-file=terraform.tfvars'
             }
           }
         }
