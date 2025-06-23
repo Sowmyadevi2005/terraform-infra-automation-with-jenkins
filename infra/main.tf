@@ -80,8 +80,3 @@ module "aws_ceritification_manager" {
   hosted_zone_id = module.hosted_zone.hosted_zone_id
 }
 
-
-
-output "dns_name" {
-  value = module.hosted_zone.aws_lb_dns_name
-}
