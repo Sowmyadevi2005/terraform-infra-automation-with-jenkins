@@ -9,10 +9,10 @@ pipeline {
     stage('clone git repo') {
       steps {
         deleteDir()
-        git branch: 'main', url: 'https://github.com/Sowmyadevi2005/flask-mysql-webapp.git'
+        git branch: 'main', url: 'https://github.com/Sowmyadevi2005/terraform-infra-automation-with-jenkins.git'
       }
     }
-  }
+ 
   stage('Terraform init') {
     steps {
       withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'aws-accesskey-sowmya',
@@ -48,7 +48,7 @@ pipeline {
             secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
             dir('infra') {
               sh 'echo "=================Terraform Apply=================="'
-              sh 'terraform apply -var-file=terraform.tfvars --auto-aprrove'
+              sh 'terraform apply -var-file=terraform.tfvars --auto-approve'
             }
           }
         }
@@ -64,11 +64,12 @@ pipeline {
             secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
             dir('infra') {
               sh 'echo "=================Terraform Destroy=================="'
-              sh 'terraform destroy -var-file=terraform.tfvars --auto-aprrove'
+              sh 'terraform destroy -var-file=terraform.tfvars --auto-approve'
             }
           }
         }
       }
     }
   }
+}
 }
